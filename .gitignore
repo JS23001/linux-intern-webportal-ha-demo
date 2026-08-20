@@ -1,0 +1,7 @@
+# Local administrator credentials. Never commit private SSH keys.
+secrets/
+
+# Downloaded installation media and portable utilities are reproducible, but
+# intentionally excluded from version control.
+installer/
+tools/
