@@ -2,8 +2,8 @@
 
 | Felt | Indhold |
 |---|---|
-| Status | Platformgrundlag klar |
-| Version | 0.2 |
+| Status | Portal, web-HA og datareplikering klar |
+| Version | 0.5 |
 | Senest opdateret | 2026-08-20 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -49,7 +49,7 @@ PBS01 / QDevice (tredje fysisk maskine)
 | Virtualisering | `PVE01` og `PVE02` | Adskiller tjenester, giver plads til udvidelse og fejltest af en hel vært. |
 | Indgang | `proxy01` og `proxy02` | HAProxy fordeler trafik; Keepalived flytter den virtuelle IP ved fejl. |
 | Web | `web01` og `web02` | To ens instanser af portalen, én på hver PVE-vært. |
-| Data | `db01` og `db02` | Replikeret database, så mock-data kan bevares ved fejl. Den præcise teknologi vælges i designfasen. |
+| Data | `db01` og `db02` | PostgreSQL 17 med streaming-replikering; `db01` er primær og `db02` er read-only standby. |
 | Backup/quorum | `PBS01` / QDevice | Uafhængige backups og quorum-støtte til et cluster med to PVE-værter. |
 
 ### Implementeret platformstatus
@@ -76,12 +76,36 @@ PBS01 / QDevice (tredje fysisk maskine)
 - Lønberegning, godkendelsesflow, eksport og integrationer.
 - Produktionsegnet design og sikkerhed ud over det nødvendige for laboratoriet.
 
+## 4.1 Valgt teknisk stack
+
+| Del | Valg |
+|---|---|
+| Gæsteoperativsystem | Debian 13 LXC-containere |
+| Reverse proxy/load balancing | HAProxy + Keepalived |
+| Webapplikation | Python/Flask + Gunicorn |
+| Database | PostgreSQL med streaming-replikering |
+| Container-skabelon | `debian-13-standard_13.6-1_amd64.tar.zst` |
+
+## 4.2 IP-plan for tjenester
+
+Alle adresser ligger på `192.168.1.0/24` med gateway/DNS `192.168.1.1`. De er kontrolleret som ledige før brug og skal efterfølgende reserveres i routeren.
+
+| Funktion | Navn | PVE-vært | IP-adresse |
+|---|---|---|---|
+| Virtuel indgangsadresse | `portal-vip` | Flytter mellem proxyer | `192.168.1.40` |
+| Proxy | `proxy01` | `pve01` | `192.168.1.41` |
+| Proxy | `proxy02` | `pve02` | `192.168.1.42` |
+| Web | `web01` | `pve01` | `192.168.1.43` |
+| Web | `web02` | `pve02` | `192.168.1.44` |
+| Database | `db01` | `pve01` | `192.168.1.45` |
+| Database | `db02` | `pve02` | `192.168.1.46` |
+
 ## 5. Afgrænsninger og risici
 
 - To PVE-værter alene giver ikke et robust quorum. Tredje maskine planlægges derfor som QDevice fra starten.
 - Backup er ikke det samme som replikering: replikering giver tilgængelighed, mens PBS01 giver mulighed for gendannelse.
 - Løsningen skal undgå, at én enkelt proxy, database eller delt filservice bliver et ubehandlet single point of failure.
-- Databasevalg og automatisk database-failover er en designbeslutning, der dokumenteres før implementering.
+- Database-replikering er implementeret. Automatisk database-failover er bevidst ikke aktiveret: den kræver et sikkert konsensus-/witness-design og testes først i en senere fase.
 
 ## 6. Leverancer
 
@@ -98,9 +122,9 @@ PBS01 / QDevice (tredje fysisk maskine)
 |---|---|---|
 | M1 | Design godkendt | Diagram, IP-plan, komponentvalg og testplan er dokumenteret. |
 | M2 | Platform klar | PVE01/PVE02, netværk og QDevice er klar. |
-| M3 | Portal klar | Mock-portalen kører ens på web01 og web02. |
-| M4 | HA klar | VIP, load balancing og web-failover er testet. |
-| M5 | Data klar | Datareplikering og database-failover er testet. |
+| M3 | Portal klar | Mock-portalen kører ens på web01 og web02. **Opnået 2026-08-20.** |
+| M4 | HA klar | VIP, load balancing og web-failover er testet. **Proxy-failover opnået 2026-08-20; fysisk værts-HA afventer QDevice.** |
+| M5 | Data klar | Datareplikering og database-failover er testet. **Replikering opnået 2026-08-20; databasefailover afventer sikkert design.** |
 | M6 | Backup klar | PBS-backup og mindst én restore er testet. |
 | M7 | Rapportgrundlag klar | Dokumentation, testbeviser og ændringslog er komplette. |
 
@@ -129,8 +153,6 @@ Projektet er klar til aflevering, når nedenstående er gennemført og dokumente
 
 | Beslutning | Muligheder | Skal afklares før |
 |---|---|---|
-| Operativsystem i tjenester | Debian eller Ubuntu Server | M2 |
-| Webserver og portalteknologi | Nginx/Apache og valgt mock-app | M3 |
-| Database og replikering | Fx PostgreSQL med valgt failover-mekanisme | M5 |
 | Netværk | IP-adresser, VLAN'er og fysisk Corosync-net | M2 |
 | Backup-politik | Tidspunkt, retention, kryptering og restore-test | M6 |
+| Databasefailover | Manuel promotion eller konsensusbaseret løsning | Før M5 kan afsluttes fuldt |

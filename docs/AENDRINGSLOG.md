@@ -8,6 +8,9 @@ Alle ændringer af scope, arkitektur, krav eller accepttest registreres her. Æn
 | 0.1 | 2026-08-20 | Valgte to PVE-værter, redundante proxyer/webtjenester og en senere tredje PBS/QDevice-maskine som målbillede. | Matcher opgaven og giver plads til backup samt korrekt quorum-planlægning. | Detaljer om database, netværk og backup afklares før deres respektive milepæle. |
 | 0.1 | 2026-08-20 | Afgrænsede tidsregistrering til et mock-system. | Fokus skal være på at demonstrere datareplikering og failover, ikke forretningsfunktioner. | Kun oprettelse og visning af testdata indgår. |
 | 0.2 | 2026-08-20 | Oprettede Proxmox-clusteret `portal-ha` med `pve01` og `pve02`. | Fælles administration og senere HA/failover kræver et clustergrundlag. | Clusterkommunikation bruger midlertidigt lab-LAN; QDevice på tredje maskine er fortsat en forudsætning for robust to-noders HA. |
+| 0.3 | 2026-08-20 | Låste teknisk stack og service-IP-plan. | Gør provisionering og test reproducerbar uden at udvide mock-systemets scope. | Debian 13 LXC, HAProxy/Keepalived, Flask/Gunicorn og PostgreSQL-replikering bruges; routerreservationer skal senere oprettes for `.40`–`.46`. |
+| 0.4 | 2026-08-20 | Tilføjede en PostgreSQL 17 primær/standby-topologi og konkrete LXC-roller. | Viser datareplikation i den krævede mock-løsning og fordeler komponenter mellem de to Proxmox-værter. | Automatisk databasefailover er fortsat uden for scope, indtil der er et sikkert konsensus-/witness-design. |
+| 0.5 | 2026-08-20 | Færdiggjorde mock-portalen, VIP/load balancing og den første dokumenterede failover-test. | Gør den aftalte HA-demo konkret og målbar. | Proxyfailover og streaming-replikering er verificeret; fysisk værts-HA, databasefailover og backup afhænger fortsat af tredje maskine og næste fase. |
 
 ## Skabelon til kommende ændring
 
