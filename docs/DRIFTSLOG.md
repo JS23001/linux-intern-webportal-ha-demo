@@ -29,6 +29,7 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-24 | Genstart | Startede laboratoriet efter weekendnedlukning. | Begge PVE-noder blev quorate igen, og alle seks LXC-containere startede automatisk. VIP-portalen svarede fra `web01`. |
 | 2026-08-24 | Observability | Udrullede portalens replikationsstatus på begge webnoder. | To kald gennem VIP'en ramte `web02` og `web01`; begge rapporterede `streaming_replicas: 1`. |
 | 2026-08-24 | Drift | Konfigurerede eksplicit LXC-opstartsorden på begge PVE-værter. | På hver vært: database `order=10,up=10`, web `order=20,up=5`, proxy `order=30,up=5`; konfigurationerne blev læst tilbage og verificeret. |
+| 2026-08-24 | Portal | Rettede navnevisning i tidsregistreringstabellen. | Fejlen `b'Jens'` blev reproduceret og derefter rettet på begge webnoder. VIP-testen viser nu `Jens` og `HA-test` som normal tekst. |
 
 ## Næste registrering
 

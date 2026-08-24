@@ -13,6 +13,7 @@ Alle ændringer af scope, arkitektur, krav eller accepttest registreres her. Æn
 | 0.5 | 2026-08-20 | Færdiggjorde mock-portalen, VIP/load balancing og den første dokumenterede failover-test. | Gør den aftalte HA-demo konkret og målbar. | Proxyfailover og streaming-replikering er verificeret; fysisk værts-HA, databasefailover og backup afhænger fortsat af tredje maskine og næste fase. |
 | 0.6 | 2026-08-24 | Tilføjede applikationssynlig replikationsstatus. | Rapporten skal kunne vise, at databasen ikke blot indeholder de samme data, men har en aktiv streamende standby. | Endpointet `/replication` og forsiden viser antal streamende replikaer; portalens databasebruger har målrettet monitoreringsadgang. |
 | 0.7 | 2026-08-24 | Fastlagde containeres opstartsorden på hver PVE-vært. | Afhængige tjenester skal starte i en forudsigelig rækkefølge efter genstart. | Database starter først, derefter web og til sidst proxy; eksisterende autostart bevares. |
+| 0.8 | 2026-08-24 | Rettede visning af bytekodede navne i tidsregistreringstabellen. | Navne blev vist som Python-repræsentation, fx `b'Jens'`, hvilket forringede mock-systemets visuelle kvalitet. | Portalen afkoder kun byteværdier til UTF-8 ved visning; eksisterende testdata ændres ikke. |
 
 ## Skabelon til kommende ændring
 

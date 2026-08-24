@@ -22,7 +22,13 @@ def get_entries():
                 ORDER BY id DESC
                 """
             )
-            return cursor.fetchall()
+            entries = cursor.fetchall()
+            # Some PostgreSQL client encodings can expose VARCHAR values as
+            # bytes. Convert only those values so the UI never renders b'Navn'.
+            return [
+                tuple(value.decode("utf-8") if isinstance(value, bytes) else value for value in entry)
+                for entry in entries
+            ]
 
 
 def get_replication_status():
