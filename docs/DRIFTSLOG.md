@@ -31,6 +31,7 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-24 | Drift | Konfigurerede eksplicit LXC-opstartsorden på begge PVE-værter. | På hver vært: database `order=10,up=10`, web `order=20,up=5`, proxy `order=30,up=5`; konfigurationerne blev læst tilbage og verificeret. |
 | 2026-08-24 | Portal | Rettede navnevisning i tidsregistreringstabellen. | Fejlen `b'Jens'` blev reproduceret og derefter rettet på begge webnoder. VIP-testen viser nu `Jens` og `HA-test` som normal tekst. |
 | 2026-08-24 | Planlægning | Kontrollerede IP-adresser til pve03-planen. | `.35` kunne ikke bruges, da den er administrations-pc'ens adresse. `.36` svarede ikke på ping/ARP og er derfor foreslået til pve03; `.47` og `.48` er foreslået til PBS01 og etcd03 og afventer DHCP-reservation. |
+| 2026-08-24 | Installation | Klargjorde Proxmox-installations-USB til pve03. | Kingston DataTraveler 3.0, Disk 1, blev skrevet råt med Proxmox VE 9.2-1 ISO. Fuld SHA-256-kontrol af alle 1.706.178.560 bytes matchede ISO'en. |
 
 ## Næste registrering
 
