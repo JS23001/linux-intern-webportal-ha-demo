@@ -312,12 +312,6 @@ def add_report(doc):
         "testdata replikeres fra PostgreSQL-primæren til standbyen. De oprindelige "
         "funktionskrav er dermed nået inden for den valgte afgrænsning."
     )
-    add_heading(doc, "Bilag: Dokumentationsgrundlag", 2)
-    doc.add_paragraph(
-        "Rapporten bygger på projektets versionsstyrede dokumentation: PROJEKTDEFINITION.md, "
-        "AENDRINGSLOG.md, DRIFTSLOG.md og TESTPLAN.md samt den aktuelle implementering i GitHub-"
-        "repositoryet linux-intern-webportal-ha-demo."
-    )
 
 
 def main():
