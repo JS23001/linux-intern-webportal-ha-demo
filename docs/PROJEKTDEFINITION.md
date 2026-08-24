@@ -2,8 +2,8 @@
 
 | Felt | Indhold |
 |---|---|
-| Status | Portal, web-HA og datareplikering klar; pve03 planlagt |
-| Version | 0.9 |
+| Status | Portal, web-HA og datareplikering klar; pve03 installeret, men ikke endnu cluster-tilføjet |
+| Version | 0.10 |
 | Senest opdateret | 2026-08-20 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -66,7 +66,7 @@ PVE03 (tredje fysisk maskine)
 
 `pve03` installeres som en tredje Proxmox VE-vært og tilføjes direkte til `portal-ha`. Den er dermed selv den tredje Corosync-stemme; en QDevice installeres **ikke** oven på pve03, da det ikke giver ekstra fejlmodstand.
 
-1. Kontrollér og reserver en ledig adresse til `pve03` (foreslået `192.168.1.36`).
+1. Opret DHCP-reservationer for pve01/pve02/pve03; pve03 anvender aktuelt `192.168.1.35`.
 2. Installér samme PVE-version og sikker SSH-adgang som pve01/pve02.
 3. Tilføj pve03 til `portal-ha` og verificér tre stemmer/quorum.
 4. Opret PBS01 som VM med en separat virtuel backupdisk på pve03.
@@ -112,7 +112,7 @@ Alle adresser ligger på `192.168.1.0/24` med gateway/DNS `192.168.1.1`. De er k
 | Web | `web02` | `pve02` | `192.168.1.44` |
 | Database | `db01` | `pve01` | `192.168.1.45` |
 | Database | `db02` | `pve02` | `192.168.1.46` |
-| Planlagt PVE-vært | `pve03` | Fysisk vært 3 | `192.168.1.36` (kontrolleret ledig 2026-08-24) |
+| PVE-vært | `pve03` | Fysisk vært 3 | `192.168.1.35` (Proxmox-webinterface verificeret) |
 | Planlagt backup-VM | `pbs01` | `pve03` | `192.168.1.47` (skal verificeres ledig) |
 | Planlagt etcd-witness | `etcd03` | `pve03` | `192.168.1.48` (skal verificeres ledig) |
 
