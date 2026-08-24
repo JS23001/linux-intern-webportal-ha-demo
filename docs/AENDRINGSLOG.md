@@ -14,6 +14,7 @@ Alle ændringer af scope, arkitektur, krav eller accepttest registreres her. Æn
 | 0.6 | 2026-08-24 | Tilføjede applikationssynlig replikationsstatus. | Rapporten skal kunne vise, at databasen ikke blot indeholder de samme data, men har en aktiv streamende standby. | Endpointet `/replication` og forsiden viser antal streamende replikaer; portalens databasebruger har målrettet monitoreringsadgang. |
 | 0.7 | 2026-08-24 | Fastlagde containeres opstartsorden på hver PVE-vært. | Afhængige tjenester skal starte i en forudsigelig rækkefølge efter genstart. | Database starter først, derefter web og til sidst proxy; eksisterende autostart bevares. |
 | 0.8 | 2026-08-24 | Rettede visning af bytekodede navne i tidsregistreringstabellen. | Navne blev vist som Python-repræsentation, fx `b'Jens'`, hvilket forringede mock-systemets visuelle kvalitet. | Portalen afkoder kun byteværdier til UTF-8 ved visning; eksisterende testdata ændres ikke. |
+| 0.9 | 2026-08-24 | Udvidede målarkitekturen med fysisk `pve03`. | Projektet har fået lov til en tredje pc, så backup, robust PVE-quorum og database-witness kan samles på én selvstændig vært i stedet for at kræve fire maskiner. | Pve03 er tredje clusterstemme (ikke QDevice); PBS01-VM og etcd03 planlægges som støttefunktioner. Rapporten fra v0.8 beskriver fortsat den allerede gennemførte to-værts-løsning. |
 
 ## Skabelon til kommende ændring
 
