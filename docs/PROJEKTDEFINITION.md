@@ -2,8 +2,8 @@
 
 | Felt | Indhold |
 |---|---|
-| Status | Portal, web-HA og datareplikering klar; tre-node Proxmox-cluster med quorum er etableret |
-| Version | 0.12 |
+| Status | Portal, web-HA og datareplikering klar; tre-node Proxmox-cluster er etableret og backupfasen er igangsat |
+| Version | 0.13 |
 | Senest opdateret | 2026-08-24 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -51,7 +51,7 @@ PVE03 (tredje fysisk maskine)
 | Indgang | `proxy01` og `proxy02` | HAProxy fordeler trafik; Keepalived flytter den virtuelle IP ved fejl. |
 | Web | `web01` og `web02` | To ens instanser af portalen, én på hver PVE-vært. |
 | Data | `db01` og `db02` | PostgreSQL 17 med streaming-replikering; `db01` er primær og `db02` er read-only standby. |
-| Backup | Planlagt `PBS01`-VM på pve03 | Backup og restore-test uden at påvirke portalens to aktive værter. |
+| Backup | `PBS01`-VM på pve03 under provisionering | Begrænset, adskilt backup- og restoremål uden at påvirke portalens to aktive værter. |
 | Witness | Planlagt `etcd01`/`etcd02`/`etcd03` | Konsensus for Patroni og dermed sikker databasefailover. |
 
 ### Implementeret platformstatus
@@ -123,6 +123,18 @@ Alle adresser ligger på `192.168.1.0/24` med gateway/DNS `192.168.1.1`. De er k
 - Løsningen skal undgå, at én enkelt proxy, database eller delt filservice bliver et ubehandlet single point of failure.
 - Database-replikering er implementeret. Automatisk database-failover er bevidst ikke aktiveret: den kræver et sikkert konsensus-/witness-design og testes først i en senere fase.
 
+## 5.1 Backup-policy for labmiljøet
+
+Pve03 har begrænset kapacitet og er ikke en off-site-løsning. Backupdesignet er derfor bevidst lille, men skal stadig kunne dokumentere en sikker og konsistent restore.
+
+| Område | Metode | Kørsel | Retention |
+|---|---|---|---|
+| LXC/VM | PBS01 backupjob | Dagligt kl. 01:30 | 7 daglige snapshots |
+| PostgreSQL | pgBackRest-basebackup + WAL-arkivering | Fuld søndag kl. 00:15; differential de øvrige nætter kl. 00:15; inkrementel dagligt kl. 12:15 | 2 komplette backupkæder, derefter automatisk oprydning |
+| Gendannelse | Dokumenteret restore-test | Mindst én gang, efter første backupkæde | Resultat og tidspunkt logges |
+
+En PBS-snapshot af en container er et ekstra infrastrukturlag, men erstatter ikke en PostgreSQL-konsistent backup. WAL-arkivering og pgBackRest gør det muligt at gendanne databasen til et valgt tidspunkt inden for den bevarede backupkæde.
+
 ## 6. Leverancer
 
 - Netværksdiagram og IP-/navneplan.
@@ -169,7 +181,7 @@ Projektet er klar til aflevering, når nedenstående er gennemført og dokumente
 
 | Beslutning | Muligheder | Skal afklares før |
 |---|---|---|
-| Pve03-kapacitet | CPU, RAM og disk til PBS-VM og etcd03 | Før installation |
+| Pve03-kapacitet | PBS01 reserveres med 2 vCPU, 4 GB RAM, 32 GB systemdisk og 140 GB datadisk; etcd03 afventer efterfølgende oprettelse | Før installation |
 | Netværk | IP-adresser, VLAN'er og fysisk Corosync-net | M2 |
 | Backup-politik | Tidspunkt, retention, kryptering og restore-test | M6 |
 | Databasefailover | Manuel promotion eller konsensusbaseret løsning | Før M5 kan afsluttes fuldt |

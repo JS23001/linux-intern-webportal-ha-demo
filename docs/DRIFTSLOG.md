@@ -37,6 +37,7 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-24 | Grundopsætning | Etablerede nøglebaseret SSH-adgang og hardenede SSH på pve03. | Root accepterer kun nøglebaseret login (`PermitRootLogin prohibit-password`); password-login er deaktiveret. |
 | 2026-08-24 | Opdatering | Opdaterede og genstartede pve03. | PVE-manager er `9.2.11` og kører kernel `7.0.14-12-pve`, svarende til de eksisterende cluster-noder. |
 | 2026-08-24 | Cluster | Tilføjede pve03 til `portal-ha`. | `pvecm status` fra pve01 viser 3 online noder, 3 forventede/aktuelle stemmer og quorum 2; clusteret er quorate. |
+| 2026-08-24 | Backup | Provisionerede PBS01 som Debian 13-VM på pve03. | VM 107 (`pbs01`) bruger 2 vCPU, 4 GB RAM, 32 GB systemdisk og separat 140 GB PBS-datadisk på `192.168.1.47`; PBS 4.2.5 og datastoreet `lab-store` er oprettet med 7 daglige retentioner. Clusterets PBS-servicekonto og backupjob afventer næste session. |
 
 ## Næste registrering
 
