@@ -34,7 +34,10 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-24 | Installation | Klargjorde Proxmox-installations-USB til pve03. | Kingston DataTraveler 3.0, Disk 1, blev skrevet råt med Proxmox VE 9.2-1 ISO. Fuld SHA-256-kontrol af alle 1.706.178.560 bytes matchede ISO'en. |
 | 2026-08-24 | Netværk | Verificerede installeret pve03 og ZyWALLs statiske DHCP-tabel. | Proxmox-webinterfaces svarer på pve01 `.33`, pve02 `.34` og pve03 `.35`; administrations-pc'en er `.36`. ZyWALLs 24 pladser til statisk DHCP var tomme. |
 | 2026-08-24 | Netværk | Oprettede og læste ZyWALLs statiske DHCP-reservationer tilbage. | Routeren bekræfter pve01 `10:E7:C6:33:C1:5D` → `192.168.1.33`, pve02 `18:60:24:A3:3C:A5` → `192.168.1.34` og pve03 `18:60:24:84:CE:4B` → `192.168.1.35`. |
+| 2026-08-24 | Grundopsætning | Etablerede nøglebaseret SSH-adgang og hardenede SSH på pve03. | Root accepterer kun nøglebaseret login (`PermitRootLogin prohibit-password`); password-login er deaktiveret. |
+| 2026-08-24 | Opdatering | Opdaterede og genstartede pve03. | PVE-manager er `9.2.11` og kører kernel `7.0.14-12-pve`, svarende til de eksisterende cluster-noder. |
+| 2026-08-24 | Cluster | Tilføjede pve03 til `portal-ha`. | `pvecm status` fra pve01 viser 3 online noder, 3 forventede/aktuelle stemmer og quorum 2; clusteret er quorate. |
 
 ## Næste registrering
 
-Næste fase er udrulning af mock-applikationen til begge webnoder og konfiguration af VIP/load balancer.
+Næste fase er kapacitetsafklaring og provisionering af PBS01/etcd03 på pve03 samt test af fysisk værts-HA.

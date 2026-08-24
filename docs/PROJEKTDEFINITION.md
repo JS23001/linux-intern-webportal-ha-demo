@@ -2,8 +2,8 @@
 
 | Felt | Indhold |
 |---|---|
-| Status | Portal, web-HA og datareplikering klar; pve03 installeret og adresseres stabilt, men er ikke endnu cluster-tilføjet |
-| Version | 0.11 |
+| Status | Portal, web-HA og datareplikering klar; tre-node Proxmox-cluster med quorum er etableret |
+| Version | 0.12 |
 | Senest opdateret | 2026-08-24 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -47,7 +47,7 @@ PVE03 (tredje fysisk maskine)
 
 | Lag | Plan | Formål |
 |---|---|---|
-| Virtualisering | `PVE01`, `PVE02` og planlagt `PVE03` | Tre rigtige clusterstemmer; pve03 giver samtidig en selvstændig fysisk platform til støttefunktioner. |
+| Virtualisering | `PVE01`, `PVE02` og `PVE03` | Tre rigtige clusterstemmer; pve03 giver samtidig en selvstændig fysisk platform til støttefunktioner. |
 | Indgang | `proxy01` og `proxy02` | HAProxy fordeler trafik; Keepalived flytter den virtuelle IP ved fejl. |
 | Web | `web01` og `web02` | To ens instanser af portalen, én på hver PVE-vært. |
 | Data | `db01` og `db02` | PostgreSQL 17 med streaming-replikering; `db01` er primær og `db02` er read-only standby. |
@@ -57,18 +57,18 @@ PVE03 (tredje fysisk maskine)
 ### Implementeret platformstatus
 
 - Proxmox-cluster: `portal-ha`.
-- Medlemmer: `pve01` (`192.168.1.33`) og `pve02` (`192.168.1.34`).
+- Medlemmer: `pve01` (`192.168.1.33`), `pve02` (`192.168.1.34`) og `pve03` (`192.168.1.35`).
 - Corosync-link: eksisterende lab-LAN (`192.168.1.0/24`). Et dedikeret fysisk cluster-net er fortsat ønskeligt, men ikke tilgængeligt i denne fase.
 - Begge noder er opdateret til samme Proxmox- og kernelversion.
-- Automatisk HA ved tab af én fysisk node er **ikke** klar endnu, før en tredje QDevice-maskine er tilsluttet. Clusteret må ikke ændres til kunstigt at acceptere én enkelt stemme, da det vil give split-brain-risiko.
+- Clusteret har tre Corosync-stemmer og quorum på to stemmer. Det kan derfor bevare quorum ved tab af én fysisk node, uden kunstigt at reducere forventede stemmer eller skabe split-brain-risiko.
 
 ### Plan for pve03
 
 `pve03` installeres som en tredje Proxmox VE-vært og tilføjes direkte til `portal-ha`. Den er dermed selv den tredje Corosync-stemme; en QDevice installeres **ikke** oven på pve03, da det ikke giver ekstra fejlmodstand.
 
 1. **Udført:** Opret DHCP-reservationer for pve01/pve02/pve03; adresserne er `.33`, `.34` og `.35`.
-2. Installér samme PVE-version og sikker SSH-adgang som pve01/pve02.
-3. Tilføj pve03 til `portal-ha` og verificér tre stemmer/quorum.
+2. **Udført:** Installér samme PVE-version og sikker SSH-adgang som pve01/pve02.
+3. **Udført:** Tilføj pve03 til `portal-ha` og verificér tre stemmer/quorum.
 4. Opret PBS01 som VM med en separat virtuel backupdisk på pve03.
 5. Opret etcd03 som lille LXC-container på pve03. Senere placeres etcd01 og etcd02 på pve01/pve02 og Patroni på db01/db02.
 6. Først derefter testes fysisk værts-HA, PBS-restore og automatisk databasefailover.
@@ -137,9 +137,9 @@ Alle adresser ligger på `192.168.1.0/24` med gateway/DNS `192.168.1.1`. De er k
 | Nr. | Milepæl | Færdig når |
 |---|---|---|
 | M1 | Design godkendt | Diagram, IP-plan, komponentvalg og testplan er dokumenteret. |
-| M2 | Platform klar | PVE01/PVE02/PVE03, netværk og tre stemmer er klar. |
+| M2 | Platform klar | PVE01/PVE02/PVE03, netværk og tre stemmer er klar. **Opnået 2026-08-24.** |
 | M3 | Portal klar | Mock-portalen kører ens på web01 og web02. **Opnået 2026-08-20.** |
-| M4 | HA klar | VIP, load balancing og web-failover er testet. **Proxy-failover opnået 2026-08-20; fysisk værts-HA afventer pve03.** |
+| M4 | HA klar | VIP, load balancing og web-failover er testet. **Proxy-failover opnået 2026-08-20; fysisk værts-HA kan nu testes med tre-node-quorum.** |
 | M5 | Data klar | Datareplikering og database-failover er testet. **Replikering opnået 2026-08-20; automatisk databasefailover afventer Patroni/etcd.** |
 | M6 | Backup klar | PBS-backup og mindst én restore er testet. |
 | M7 | Rapportgrundlag klar | Dokumentation, testbeviser og ændringslog er komplette. |
