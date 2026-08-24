@@ -2,9 +2,9 @@
 
 | Felt | Indhold |
 |---|---|
-| Status | Portal, web-HA og datareplikering klar; pve03 installeret, men ikke endnu cluster-tilføjet |
-| Version | 0.10 |
-| Senest opdateret | 2026-08-20 |
+| Status | Portal, web-HA og datareplikering klar; pve03 installeret og adresseres stabilt, men er ikke endnu cluster-tilføjet |
+| Version | 0.11 |
+| Senest opdateret | 2026-08-24 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
 
@@ -66,7 +66,7 @@ PVE03 (tredje fysisk maskine)
 
 `pve03` installeres som en tredje Proxmox VE-vært og tilføjes direkte til `portal-ha`. Den er dermed selv den tredje Corosync-stemme; en QDevice installeres **ikke** oven på pve03, da det ikke giver ekstra fejlmodstand.
 
-1. Opret DHCP-reservationer for pve01/pve02/pve03; pve03 anvender aktuelt `192.168.1.35`.
+1. **Udført:** Opret DHCP-reservationer for pve01/pve02/pve03; adresserne er `.33`, `.34` og `.35`.
 2. Installér samme PVE-version og sikker SSH-adgang som pve01/pve02.
 3. Tilføj pve03 til `portal-ha` og verificér tre stemmer/quorum.
 4. Opret PBS01 som VM med en separat virtuel backupdisk på pve03.

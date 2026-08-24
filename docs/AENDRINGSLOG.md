@@ -16,6 +16,7 @@ Alle ændringer af scope, arkitektur, krav eller accepttest registreres her. Æn
 | 0.8 | 2026-08-24 | Rettede visning af bytekodede navne i tidsregistreringstabellen. | Navne blev vist som Python-repræsentation, fx `b'Jens'`, hvilket forringede mock-systemets visuelle kvalitet. | Portalen afkoder kun byteværdier til UTF-8 ved visning; eksisterende testdata ændres ikke. |
 | 0.9 | 2026-08-24 | Udvidede målarkitekturen med fysisk `pve03`. | Projektet har fået lov til en tredje pc, så backup, robust PVE-quorum og database-witness kan samles på én selvstændig vært i stedet for at kræve fire maskiner. | Pve03 er tredje clusterstemme (ikke QDevice); PBS01-VM og etcd03 planlægges som støttefunktioner. Rapporten fra v0.8 beskriver fortsat den allerede gennemførte to-værts-løsning. |
 | 0.10 | 2026-08-24 | Registrerede pve03's faktiske netværksstatus. | Den installerede vært blev fundet på `.35`, mens administrations-pc'en bruger `.36`; ZyWALL havde ingen eksisterende statiske DHCP-reservationer. | Pve03-planen bruger `.35`; reservationerne for alle tre PVE-værter afventer godkendt routerændring. |
+| 0.11 | 2026-08-24 | Oprettede statiske DHCP-reservationer for alle tre Proxmox-værter. | Management- og Corosync-adresser skal være stabile, også efter en DHCP-fornyelse eller genstart. | ZyWALL reserverer nu pve01 `10:E7:C6:33:C1:5D` → `.33`, pve02 `18:60:24:A3:3C:A5` → `.34` og pve03 `18:60:24:84:CE:4B` → `.35`; konfigurationen er læst tilbage fra routeren. |
 
 ## Skabelon til kommende ændring
 
