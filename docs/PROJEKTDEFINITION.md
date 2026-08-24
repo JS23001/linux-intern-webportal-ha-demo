@@ -3,7 +3,7 @@
 | Felt | Indhold |
 |---|---|
 | Status | Portal, web-HA og datareplikering klar |
-| Version | 0.6 |
+| Version | 0.7 |
 | Senest opdateret | 2026-08-20 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
