@@ -23,6 +23,7 @@
     <main>
       <h1>Tidsregistrering – HA-demo</h1>
       <p class="status">Aktiv webserver: {{ server_name }}</p>
+      <p class="status">Streamende database-standbyer: {{ streaming_replicas if streaming_replicas is not none else "ukendt" }}</p>
       <section class="card">
         <h2>Opret testregistrering</h2>
         <form action="/entries" method="post">

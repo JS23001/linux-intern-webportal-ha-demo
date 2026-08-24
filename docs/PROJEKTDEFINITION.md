@@ -3,7 +3,7 @@
 | Felt | Indhold |
 |---|---|
 | Status | Portal, web-HA og datareplikering klar |
-| Version | 0.5 |
+| Version | 0.6 |
 | Senest opdateret | 2026-08-20 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -67,7 +67,7 @@ PBS01 / QDevice (tredje fysisk maskine)
 - Opret en testregistrering med navn, dato og timer.
 - Vis alle testregistreringer i en tabel.
 - Vis identiteten på den webserver, der leverer siden.
-- Vis relevant driftsstatus, fx aktiv database/primær node eller seneste synkronisering.
+- Vis relevant driftsstatus, herunder antal streamende database-standbyer.
 - Gem data i den database, der indgår i replikeringsdesignet.
 
 ### Uden for scope

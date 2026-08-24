@@ -26,6 +26,8 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-20 | HA | Konfigurerede og testede HAProxy/Keepalived. | VIP `192.168.1.40` fordelte to efterfølgende kald til `web01` og `web02`. Ved stop af Keepalived på `proxy01` overtog `proxy02` VIP'en, og portalens health endpoint svarede fortsat. |
 | 2026-08-20 | HA | Testede webnode-failover via HAProxy health checks. | Et første kald efter 3 sekunder gav forventeligt ikke konvergeret HTTP `503`. Efter 10 sekunder med `web01` stoppet leverede VIP'en `/health` fra `web02`; `web01` blev derefter startet igen. |
 | 2026-08-20 | Data | Testede skrivevej og replikering. | En testregistrering oprettet via VIP'en gav HTTP `302`; den var derefter til stede på `db02`-standbyen. Rettigheder til applikationsrollen blev udvidet målrettet efter første test fejlede med HTTP `500`. |
+| 2026-08-24 | Genstart | Startede laboratoriet efter weekendnedlukning. | Begge PVE-noder blev quorate igen, og alle seks LXC-containere startede automatisk. VIP-portalen svarede fra `web01`. |
+| 2026-08-24 | Observability | Udrullede portalens replikationsstatus på begge webnoder. | To kald gennem VIP'en ramte `web02` og `web01`; begge rapporterede `streaming_replicas: 1`. |
 
 ## Næste registrering
 

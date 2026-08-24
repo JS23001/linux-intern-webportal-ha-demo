@@ -25,6 +25,21 @@ def get_entries():
             return cursor.fetchall()
 
 
+def get_replication_status():
+    if not DATABASE_URL:
+        return None
+    with psycopg.connect(DATABASE_URL) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT count(*)
+                FROM pg_stat_replication
+                WHERE state = 'streaming'
+                """
+            )
+            return cursor.fetchone()[0]
+
+
 @app.get("/health")
 def health():
     if not DATABASE_URL:
@@ -48,17 +63,33 @@ def health():
 def index():
     try:
         entries = get_entries()
+        streaming_replicas = get_replication_status()
         database_error = None
     except psycopg.Error as error:
         entries = []
+        streaming_replicas = None
         database_error = str(error)
     return render_template(
         "index.html",
         entries=entries,
+        streaming_replicas=streaming_replicas,
         database_error=database_error,
         server_name=SERVER_NAME,
         today=date.today().isoformat(),
     )
+
+
+@app.get("/replication")
+def replication():
+    try:
+        streaming_replicas = get_replication_status()
+    except psycopg.Error as error:
+        return {"status": "unhealthy", "database": str(error)}, 503
+    return {
+        "status": "ok",
+        "web_server": SERVER_NAME,
+        "streaming_replicas": streaming_replicas,
+    }
 
 
 @app.post("/entries")
