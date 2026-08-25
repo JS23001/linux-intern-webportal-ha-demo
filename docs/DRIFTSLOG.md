@@ -41,7 +41,7 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-25 | Backup | Tilsluttede PBS-datastoreet til Proxmox og oprettede dagligt backupjob. | `pbs-lab` er aktivt; LXC 101-106 tager snapshot-backup dagligt kl. 01:30. En manuel backup og en midlertidig restore af CT101 til CT201 blev gennemført; testcontaineren blev slettet efter kontrollen for at undgå IP-konflikt. |
 | 2026-08-25 | Database-HA | Oprettede etcd01 (`.48`), etcd02 (`.49`) og etcd03 (`.50`) og verificerede tre-medlems-kvorum. | etcd endpoint-status viste tre raske medlemmer og én leder. |
 | 2026-08-25 | Database-HA | Installerede Patroni på db01/db02 og satte HAProxy TCP-endpoint på portal-VIP'en. | HAProxy tjekker Patronis `/primary` på port 8008 og videresender kun port 5432 til den aktuelle PostgreSQL-leder. Begge webnoder bruger nu VIP'en som databasehost. |
-| 2026-08-25 | Database-HA | Kontrolleret automatisk failover-test. | Stop af Patroni på db01 stoppede den oprindelige leder. Efter leader-lease udløb promoverede Patroni db02 automatisk til leder (timeline 3). Portalens health-check gennem VIP'en var grøn, og db01 blev startet igen som streaming-replika med 0 MB lag. |
+| 2026-08-25 | Database-HA | Kontrolleret automatisk failover-test. | Stop af Patroni på db01 stoppede den oprindelige leder. Efter leader-lease udløb promoverede Patroni db02 automatisk til leder (timeline 3). Portalens health-check gennem VIP'en var grøn, og db01 blev startet igen som streaming-replika med 0 MB lag. En ny portalregistrering skrevet gennem VIP'en efter failover blev derefter læst på begge databasenoder. |
 
 ## Næste registrering
 
