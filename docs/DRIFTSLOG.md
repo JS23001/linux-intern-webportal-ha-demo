@@ -44,7 +44,9 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-25 | Database-HA | Kontrolleret automatisk failover-test. | Stop af Patroni på db01 stoppede den oprindelige leder. Efter leader-lease udløb promoverede Patroni db02 automatisk til leder (timeline 3). Portalens health-check gennem VIP'en var grøn, og db01 blev startet igen som streaming-replika med 0 MB lag. En ny portalregistrering skrevet gennem VIP'en efter failover blev derefter læst på begge databasenoder. |
 | 2026-08-25 | Databasebackup | Installerede pgBackRest 2.55.1 på db01, db02 og PBS01 og oprettede et nøglebeskyttet SFTP-repository på PBS01. | Patroni styrer WAL-arkivering; fuld backup og efterfølgende inkrementel backup blev oprettet og verificeret med `pgbackrest info`. Backupscriptet kører kun, når lokal Patroni-API svarer `/primary`. |
 | 2026-08-25 | Databasebackup | Testede restore til en særskilt, midlertidig datamappe. | Første SFTP-restore fejlede i pgBackRest/libssh2, selv om direkte SFTP-læsning virkede. Repositoryet blev derfor flyttet til pgBackRests SSH-baserede repository-host-protokol på PBS01. Den nye restore nåede konsistent WAL-recovery, startede isoleret read-only på lokal port 55432 og returnerede `Failover-test-20260825`; testdataområdet blev derefter stoppet og slettet. |
+| 2026-08-25 | Fysisk HA | Stoppede pve01 og kontrollerede drift på pve02/pve03. | Clusteret beholdt quorum med 2 af 3 stemmer. db02 overtog automatisk Patroni-lederrollen (timeline 5), proxy02 overtog VIP `192.168.1.40`, og web02 svarede grønt. Efter opstart vendte pve01, proxy01, web01 og db01 tilbage; db01 streamer replika med 0 MB lag. |
+| 2026-08-25 | Fysisk HA | Rettede etcd01 efter værtsgenstart. | Etcd01 fejlede først, fordi `.48` ikke var tildelt ved serviceopstart. Systemd-drop-in venter nu på `network-online.target` og bruger `Restart=on-failure`; efter rettelsen er alle tre etcd-endpoints raske. |
 
 ## Næste registrering
 
-Næste fase er fysisk værts-HA og afsluttende rapportmateriale.
+Næste fase er afsluttende rapportmateriale og beskrivelse af lokal-LVM-begrænsningen.
