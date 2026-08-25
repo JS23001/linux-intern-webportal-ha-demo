@@ -154,9 +154,9 @@ def add_title_page(doc):
     set_table_geometry(table, [2700, 6660])
     values = [
         ("Projekt", "Intern webportal - HA-demo"),
-        ("Platform", "To Proxmox VE-værter med Debian LXC-containere"),
-        ("Dato", "24. august 2026"),
-        ("Status", "Krav om web-HA og datareplikering er opfyldt"),
+        ("Platform", "Tre Proxmox VE-værter med Debian LXC/VM-tjenester"),
+        ("Dato", "25. august 2026"),
+        ("Status", "Web-HA, databasefailover, backup og restore er verificeret"),
     ]
     for row, (label, value) in zip(table.rows, values):
         set_cell_shading(row.cells[0], LIGHT_BLUE)
@@ -168,7 +168,7 @@ def add_title_page(doc):
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(28)
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = p.add_run("Afgrænsning: Backup/PBS og tredje server indgår ikke i denne rapport.")
+    r = p.add_run("Labafgrænsning: Lokal LVM erstatter ikke delt eller replikeret produktionsstorage.")
     set_font(r, size=10, color="7A5A00", italic=True)
     doc.add_page_break()
 
@@ -203,22 +203,23 @@ def add_table(doc, headers, rows, widths):
 def add_report(doc):
     add_heading(doc, "1. Resumé")
     doc.add_paragraph(
-        "Projektet har etableret en intern webportal på to fysiske Linux-baserede "
+        "Projektet har etableret en intern webportal på tre fysiske Linux-baserede "
         "Proxmox VE-værter. Portalen er et mock-tidsregistreringssystem, der bruges "
-        "til at demonstrere høj tilgængelighed, belastningsfordeling og datareplikering."
+        "til at demonstrere høj tilgængelighed, belastningsfordeling, datareplikering og databasefailover."
     )
     doc.add_paragraph(
         "Løsningen opfylder de centrale krav: Trafik går via én virtuel IP-adresse, "
         "fordeles mellem to webservere og fortsætter ved fejl på en proxy eller webnode. "
-        "Data gemmes i PostgreSQL på en primær database og replikeres løbende til en "
-        "standby-database."
+        "PostgreSQL styres af Patroni med et tre-medlems etcd-kvorum, replikeres løbende "
+        "og gendannes med pgBackRest/WAL til PBS01."
     )
     add_heading(doc, "Resultat i kort form", 2)
-    add_bullet(doc, "To Proxmox VE-værter er samlet i clusteret portal-ha.")
+    add_bullet(doc, "Tre Proxmox VE-værter er samlet i clusteret portal-ha med quorum på to stemmer.")
     add_bullet(doc, "VIP 192.168.1.40 flytter automatisk mellem to HAProxy/Keepalived-noder.")
     add_bullet(doc, "To Flask/Gunicorn-webnoder leverer samme mock-portal.")
-    add_bullet(doc, "PostgreSQL 17 streaming-replikering er verificeret med testdata.")
-    add_bullet(doc, "Test viser proxy-failover, web-failover, trafikfordeling og replikerede data.")
+    add_bullet(doc, "PostgreSQL 17, Patroni og etcd udfører automatisk databasefailover.")
+    add_bullet(doc, "PBS01 indeholder testet Proxmox- og pgBackRest/WAL-restore.")
+    add_bullet(doc, "Test viser proxy-, web-, database- og fysisk værtsfailover samt replikerede data.")
 
     add_heading(doc, "2. Opgavens mål og afgrænsning")
     doc.add_paragraph(
@@ -230,8 +231,8 @@ def add_report(doc):
     doc.add_paragraph(
         "Portalen er bevidst et mock-system. Den kan oprette og vise testregistreringer, "
         "men indeholder ikke login, løn, personadministration eller integrationer. En "
-        "eventuel tredje server til Proxmox Backup Server eller QDevice er en senere "
-        "ekstraopgave og er ikke en del af denne rapport eller vurderingen her.")
+        "tredje PVE-vært, PBS01 og etcd indgår efter en dokumenteret scopeændring, fordi "
+        "de giver sikkert quorum, backup og databasefailover i samme labmiljø.")
 
     add_heading(doc, "3. Løsningsdesign")
     doc.add_paragraph(
@@ -243,16 +244,21 @@ def add_report(doc):
         ("Indgang", "portal-vip: 192.168.1.40", "Én fast adresse for brugere."),
         ("Proxy", "proxy01 / proxy02", "HAProxy fordeler HTTP-trafik; Keepalived flytter VIP'en."),
         ("Web", "web01 / web02", "Flask/Gunicorn leverer mock-tidsregistreringen."),
-        ("Data", "db01 / db02", "PostgreSQL 17 med primær og fysisk streaming-standby."),
-        ("Virtualisering", "pve01 / pve02", "To fysiske Proxmox VE-værter i clusteret portal-ha."),
+        ("Data", "db01 / db02", "PostgreSQL 17, Patroni og streaming-replika."),
+        ("Konsensus", "etcd01 / etcd02 / etcd03", "Tre stemmer for sikker Patroni-promotion."),
+        ("Backup", "pbs01", "PBS-datastore og pgBackRest/WAL-repository."),
+        ("Virtualisering", "pve01 / pve02 / pve03", "Tre fysiske Proxmox VE-værter i clusteret portal-ha."),
     ], [1500, 3300, 4560])
     add_heading(doc, "Netværksplan", 2)
     add_table(doc, ["Navn", "IP-adresse", "Placering"], [
         ("pve01", "192.168.1.33", "Fysisk vært 1"),
         ("pve02", "192.168.1.34", "Fysisk vært 2"),
+        ("pve03", "192.168.1.35", "Fysisk vært 3 / quorum / PBS"),
         ("proxy01 / proxy02", ".41 / .42", "PVE01 / PVE02"),
         ("web01 / web02", ".43 / .44", "PVE01 / PVE02"),
         ("db01 / db02", ".45 / .46", "PVE01 / PVE02"),
+        ("pbs01", ".47", "PVE03"),
+        ("etcd01 / 02 / 03", ".48 / .49 / .50", "PVE01 / PVE02 / PVE03"),
     ], [2700, 2400, 4260])
 
     add_heading(doc, "4. Implementering")
@@ -271,9 +277,9 @@ def add_report(doc):
     )
     add_heading(doc, "Datareplikering", 2)
     doc.add_paragraph(
-        "db01 er PostgreSQL-primær, og db02 er fysisk standby. Standbyen modtager WAL-"
-        "data løbende fra primæren. Portalens endpoint /replication viser antallet af "
-        "streamende standbyer; ved test rapporterede begge webnoder værdien 1."
+        "Patroni vælger én PostgreSQL-leder og holder den anden node som fysisk streaming-replika. "
+        "Tre etcd-noder er konsensuslaget, og HAProxy sender kun databaseforbindelser til Patronis aktuelle /primary-node. "
+        "Portalens endpoint /replication viser antallet af streamende standbyer."
     )
 
     add_heading(doc, "5. Test og kravopfyldelse")
@@ -285,6 +291,9 @@ def add_report(doc):
         ("Overtagelse ved webfejl", "Efter HAProxy-health-check leverede web02 portalen, mens web01 var stoppet.", "Opfyldt"),
         ("Samme data via begge webservere", "Testregistrering oprettet via VIP var til stede på db02-standbyen.", "Opfyldt"),
         ("Synlig replikering", "To /replication-kald via VIP viste streaming_replicas: 1.", "Opfyldt"),
+        ("Automatisk databasefailover", "Stop af db01 gav automatisk promotion af db02; db01 kom tilbage som replika med 0 MB lag.", "Opfyldt"),
+        ("Fysisk værtsfailover", "Stop af pve01 beholdt quorum på pve02/pve03; VIP, portal og db02 fortsatte.", "Opfyldt"),
+        ("Backup og restore", "PBS-restore samt isoleret pgBackRest/WAL-restore returnerede kendt portaldata.", "Opfyldt"),
     ], [2100, 5600, 1660])
     add_heading(doc, "Observation om failover-tid", 2)
     doc.add_paragraph(
@@ -302,15 +311,16 @@ def add_report(doc):
         "overskueligt, men viser stadig den fulde tekniske kæde fra bruger til replikeret data."
     )
     add_heading(doc, "Bevidste begrænsninger", 2)
-    add_bullet(doc, "Automatisk databasefailover er ikke aktiveret. Det kræver et sikkert konsensus- eller witness-design for at undgå split brain.")
-    add_bullet(doc, "Automatisk overtagelse efter tab af en hel PVE-vært er ikke testet. Et to-noders cluster bør have en tredje QDevice-stemme, før den test udføres.")
-    add_bullet(doc, "Backup, PBS og restore-test er uden for scope i denne rapport.")
+    add_bullet(doc, "Etcd-trafik er ukrypteret HTTP i det afgrænsede lab-LAN; produktion kræver TLS og firewall-regler.")
+    add_bullet(doc, "Services på en stoppet PVE-vært flyttes ikke automatisk, fordi LXC-diske ligger på lokal LVM. Redundante modparter fortsætter dog på den anden vært.")
+    add_bullet(doc, "PBS01 ligger på samme fysiske lab som clusterets tredje vært og er ikke en off-site-backup.")
     add_heading(doc, "7. Konklusion")
     doc.add_paragraph(
         "Den interne webportal er implementeret og dokumenteret som en fungerende HA-demo. "
         "Portaltrafik fordeles mellem to Linux-webnoder, VIP'en flytter ved proxyfejl, og "
-        "testdata replikeres fra PostgreSQL-primæren til standbyen. De oprindelige "
-        "funktionskrav er dermed nået inden for den valgte afgrænsning."
+        "testdata replikeres og kan automatisk fortsætte på ny databaseleder. Den testede "
+        "backup- og restorevej supplerer tilgængeligheden med gendannelse. De oprindelige "
+        "funktionskrav og de dokumenterede HA-udvidelser er dermed nået inden for labafgrænsningen."
     )
 
 
