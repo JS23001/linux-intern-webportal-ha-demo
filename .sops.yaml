@@ -1,0 +1,5 @@
+creation_rules:
+  - path_regex: .*\.enc\.yaml$
+    age: age1fc4hq8rhtr52pv2yh94p96s0c93j8n7ukr2dqpxhppr7jp7twg5q0c8ahm
+  - path_regex: .*portal-runtime\.template\.yaml$
+    age: age1fc4hq8rhtr52pv2yh94p96s0c93j8n7ukr2dqpxhppr7jp7twg5q0c8ahm

@@ -46,6 +46,7 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-25 | Databasebackup | Testede restore til en særskilt, midlertidig datamappe. | Første SFTP-restore fejlede i pgBackRest/libssh2, selv om direkte SFTP-læsning virkede. Repositoryet blev derfor flyttet til pgBackRests SSH-baserede repository-host-protokol på PBS01. Den nye restore nåede konsistent WAL-recovery, startede isoleret read-only på lokal port 55432 og returnerede `Failover-test-20260825`; testdataområdet blev derefter stoppet og slettet. |
 | 2026-08-25 | Fysisk HA | Stoppede pve01 og kontrollerede drift på pve02/pve03. | Clusteret beholdt quorum med 2 af 3 stemmer. db02 overtog automatisk Patroni-lederrollen (timeline 5), proxy02 overtog VIP `192.168.1.40`, og web02 svarede grønt. Efter opstart vendte pve01, proxy01, web01 og db01 tilbage; db01 streamer replika med 0 MB lag. |
 | 2026-08-25 | Fysisk HA | Rettede etcd01 efter værtsgenstart. | Etcd01 fejlede først, fordi `.48` ikke var tildelt ved serviceopstart. Systemd-drop-in venter nu på `network-online.target` og bruger `Restart=on-failure`; efter rettelsen er alle tre etcd-endpoints raske. |
+| 2026-08-25 | Sikkerhed | Installerede SOPS og age på administrations-pc'en og oprettede lokal age-nøgle. | Den private nøgle ligger i Git-ignoreret `secrets/` med begrænsede rettigheder. En SOPS-krypteret runtime-struktur blev oprettet og dekryptering valideret; aktive driftscredentials er ikke ændret. |
 
 ## Næste registrering
 

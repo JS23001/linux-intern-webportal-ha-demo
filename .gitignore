@@ -1,5 +1,6 @@
 # Local administrator credentials. Never commit private SSH keys.
-secrets/
+secrets/*
+!secrets/*.enc.yaml
 github info.txt
 
 # Downloaded installation media and portable utilities are reproducible, but
