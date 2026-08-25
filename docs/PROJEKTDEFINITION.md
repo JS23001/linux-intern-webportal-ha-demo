@@ -3,7 +3,7 @@
 | Felt | Indhold |
 |---|---|
 | Status | Portal, web-HA, PBS-backup og automatisk databasefailover er verificeret i labmiljøet |
-| Version | 0.14 |
+| Version | 0.15 |
 | Senest opdateret | 2026-08-25 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -138,6 +138,10 @@ Pve03 har begrænset kapacitet og er ikke en off-site-løsning. Backupdesignet e
 | Gendannelse | Dokumenteret restore-test | Mindst én gang, efter første backupkæde | Resultat og tidspunkt logges |
 
 En PBS-snapshot af en container er et ekstra infrastrukturlag, men erstatter ikke en PostgreSQL-konsistent backup. WAL-arkivering og pgBackRest gør det muligt at gendanne databasen til et valgt tidspunkt inden for den bevarede backupkæde.
+
+## 5.2 Hemmelighedshåndtering
+
+Labbet bruger SOPS + age til krypterede secrets i Git og root-ejede runtime-filer med rettigheden `0600` på tjenesterne. En Vault-klynge er fravalgt, fordi den ville være en uforholdsmæssigt tung ekstra afhængighed i dette kapacitetsbegrænsede mock-miljø. Den konkrete nøgle-, deploy- og rotationsprocedure findes i `HEMMELIGHEDSHAANDTERING.md`.
 
 ## 6. Leverancer
 
