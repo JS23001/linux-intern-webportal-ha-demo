@@ -2,9 +2,9 @@
 
 | Felt | Indhold |
 |---|---|
-| Status | Portal, web-HA og datareplikering klar; tre-node Proxmox-cluster er etableret og backupfasen er igangsat |
-| Version | 0.13 |
-| Senest opdateret | 2026-08-24 |
+| Status | Portal, web-HA, PBS-backup og automatisk databasefailover er verificeret i labmiljøet |
+| Version | 0.14 |
+| Senest opdateret | 2026-08-25 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
 
@@ -50,9 +50,10 @@ PVE03 (tredje fysisk maskine)
 | Virtualisering | `PVE01`, `PVE02` og `PVE03` | Tre rigtige clusterstemmer; pve03 giver samtidig en selvstændig fysisk platform til støttefunktioner. |
 | Indgang | `proxy01` og `proxy02` | HAProxy fordeler trafik; Keepalived flytter den virtuelle IP ved fejl. |
 | Web | `web01` og `web02` | To ens instanser af portalen, én på hver PVE-vært. |
-| Data | `db01` og `db02` | PostgreSQL 17 med streaming-replikering; `db01` er primær og `db02` er read-only standby. |
-| Backup | `PBS01`-VM på pve03 under provisionering | Begrænset, adskilt backup- og restoremål uden at påvirke portalens to aktive værter. |
-| Witness | Planlagt `etcd01`/`etcd02`/`etcd03` | Konsensus for Patroni og dermed sikker databasefailover. |
+| Data | `db01` og `db02` | PostgreSQL 17 styret af Patroni med streaming-replikering og automatisk rollevalg. |
+| Database-endpoint | `portal-vip:5432` | HAProxy sender kun databaseforbindelser til Patroni-noden, som svarer `200` på `/primary`. |
+| Backup | `PBS01`-VM på pve03 | Adskilt backup- og restoremål med 7 dages retention. |
+| Witness | `etcd01`/`etcd02`/`etcd03` | Tre etcd-medlemmer giver Patroni konsensus og forhindrer usikker promotion/split brain. |
 
 ### Implementeret platformstatus
 
@@ -69,9 +70,9 @@ PVE03 (tredje fysisk maskine)
 1. **Udført:** Opret DHCP-reservationer for pve01/pve02/pve03; adresserne er `.33`, `.34` og `.35`.
 2. **Udført:** Installér samme PVE-version og sikker SSH-adgang som pve01/pve02.
 3. **Udført:** Tilføj pve03 til `portal-ha` og verificér tre stemmer/quorum.
-4. Opret PBS01 som VM med en separat virtuel backupdisk på pve03.
-5. Opret etcd03 som lille LXC-container på pve03. Senere placeres etcd01 og etcd02 på pve01/pve02 og Patroni på db01/db02.
-6. Først derefter testes fysisk værts-HA, PBS-restore og automatisk databasefailover.
+4. **Udført:** Opret PBS01 som VM med en separat virtuel backupdisk på pve03 og konfigurer PBS-datastore/backupjob.
+5. **Udført:** Opret etcd01/02/03 på hver sin PVE-vært og konfigurer Patroni på db01/db02.
+6. **Udført:** Test automatisk databasefailover. Fysisk værts-HA er næste selvstændige test.
 
 ## 4. Mock-tidsregistrering
 
@@ -113,15 +114,18 @@ Alle adresser ligger på `192.168.1.0/24` med gateway/DNS `192.168.1.1`. De er k
 | Database | `db01` | `pve01` | `192.168.1.45` |
 | Database | `db02` | `pve02` | `192.168.1.46` |
 | PVE-vært | `pve03` | Fysisk vært 3 | `192.168.1.35` (Proxmox-webinterface verificeret) |
-| Planlagt backup-VM | `pbs01` | `pve03` | `192.168.1.47` (skal verificeres ledig) |
-| Planlagt etcd-witness | `etcd03` | `pve03` | `192.168.1.48` (skal verificeres ledig) |
+| Backup-VM | `pbs01` | `pve03` | `192.168.1.47` |
+| etcd | `etcd01` | `pve01` | `192.168.1.48` |
+| etcd | `etcd02` | `pve02` | `192.168.1.49` |
+| etcd | `etcd03` | `pve03` | `192.168.1.50` |
 
 ## 5. Afgrænsninger og risici
 
 - Pve03 skal være en selvstændig fysisk maskine. Hvis den fejler, er pve01 og pve02 fortsat to af tre clusterstemmer.
 - Backup er ikke det samme som replikering: replikering giver tilgængelighed, mens PBS01 giver mulighed for gendannelse.
 - Løsningen skal undgå, at én enkelt proxy, database eller delt filservice bliver et ubehandlet single point of failure.
-- Database-replikering er implementeret. Automatisk database-failover er bevidst ikke aktiveret: den kræver et sikkert konsensus-/witness-design og testes først i en senere fase.
+- Databasefailover er baseret på Patroni og et tre-medlems etcd-kvorum. Patroni må kun promovere én databaseleder; HAProxy vælger den aktuelle leder via Patronis `/primary`-endpoint.
+- etcd-trafik er ukrypteret HTTP i dette afgrænsede lab-LAN. En produktionsløsning skal bruge TLS, firewall-regler, adskilte konti og hemmelighedshåndtering.
 
 ## 5.1 Backup-policy for labmiljøet
 
@@ -130,7 +134,7 @@ Pve03 har begrænset kapacitet og er ikke en off-site-løsning. Backupdesignet e
 | Område | Metode | Kørsel | Retention |
 |---|---|---|---|
 | LXC/VM | PBS01 backupjob | Dagligt kl. 01:30 | 7 daglige snapshots |
-| PostgreSQL | pgBackRest-basebackup + WAL-arkivering | Fuld søndag kl. 00:15; differential de øvrige nætter kl. 00:15; inkrementel dagligt kl. 12:15 | 2 komplette backupkæder, derefter automatisk oprydning |
+| PostgreSQL | Konsistent pgBackRest-basebackup + WAL-arkivering | Planlagt efter failover-verificering: fuld søndag kl. 00:15; differential de øvrige nætter kl. 00:15; inkrementel dagligt kl. 12:15 | 2 komplette backupkæder, derefter automatisk oprydning |
 | Gendannelse | Dokumenteret restore-test | Mindst én gang, efter første backupkæde | Resultat og tidspunkt logges |
 
 En PBS-snapshot af en container er et ekstra infrastrukturlag, men erstatter ikke en PostgreSQL-konsistent backup. WAL-arkivering og pgBackRest gør det muligt at gendanne databasen til et valgt tidspunkt inden for den bevarede backupkæde.
@@ -152,8 +156,8 @@ En PBS-snapshot af en container er et ekstra infrastrukturlag, men erstatter ikk
 | M2 | Platform klar | PVE01/PVE02/PVE03, netværk og tre stemmer er klar. **Opnået 2026-08-24.** |
 | M3 | Portal klar | Mock-portalen kører ens på web01 og web02. **Opnået 2026-08-20.** |
 | M4 | HA klar | VIP, load balancing og web-failover er testet. **Proxy-failover opnået 2026-08-20; fysisk værts-HA kan nu testes med tre-node-quorum.** |
-| M5 | Data klar | Datareplikering og database-failover er testet. **Replikering opnået 2026-08-20; automatisk databasefailover afventer Patroni/etcd.** |
-| M6 | Backup klar | PBS-backup og mindst én restore er testet. |
+| M5 | Data klar | Datareplikering og database-failover er testet. **Opnået 2026-08-25: db01 blev stoppet, db02 blev automatisk Patroni-leder, og db01 kom tilbage som streaming-replika.** |
+| M6 | Backup klar | PBS-backup og infrastrukturel restore er testet. PostgreSQL PITR/pgBackRest er fortsat en forbedringsopgave. |
 | M7 | Rapportgrundlag klar | Dokumentation, testbeviser og ændringslog er komplette. |
 
 ## 8. Accepttest
@@ -181,7 +185,7 @@ Projektet er klar til aflevering, når nedenstående er gennemført og dokumente
 
 | Beslutning | Muligheder | Skal afklares før |
 |---|---|---|
-| Pve03-kapacitet | PBS01 reserveres med 2 vCPU, 4 GB RAM, 32 GB systemdisk og 140 GB datadisk; etcd03 afventer efterfølgende oprettelse | Før installation |
-| Netværk | IP-adresser, VLAN'er og fysisk Corosync-net | M2 |
-| Backup-politik | Tidspunkt, retention, kryptering og restore-test | M6 |
-| Databasefailover | Manuel promotion eller konsensusbaseret løsning | Før M5 kan afsluttes fuldt |
+| Pve03-kapacitet | PBS01 bruger 2 vCPU, 4 GB RAM, 32 GB systemdisk og 140 GB datadisk; etcd03 er etableret som lille LXC | Løbende kapacitetskontrol |
+| Netværk | VLAN'er og fysisk Corosync-net | Før produktionslignende drift |
+| Backup-politik | PostgreSQL PITR, kryptering og database-konsistent restore-test | Før endelig rapport/aflevering |
+| PostgreSQL PITR | Implementér pgBackRest/WAL og udfør en database-konsistent restore-test | Før endelig rapport/aflevering |
