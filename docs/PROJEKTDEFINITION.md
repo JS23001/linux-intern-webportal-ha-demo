@@ -3,7 +3,7 @@
 | Felt | Indhold |
 |---|---|
 | Status | Portal, web-HA, PBS-backup og automatisk databasefailover er verificeret i labmiljøet |
-| Version | 0.16 |
+| Version | 0.17 |
 | Senest opdateret | 2026-08-25 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -161,7 +161,7 @@ Labbet bruger SOPS + age til krypterede secrets i Git og root-ejede runtime-file
 | M3 | Portal klar | Mock-portalen kører ens på web01 og web02. **Opnået 2026-08-20.** |
 | M4 | HA klar | VIP, load balancing og web-failover er testet. **Proxy-failover opnået 2026-08-20; fysisk værts-HA kan nu testes med tre-node-quorum.** |
 | M5 | Data klar | Datareplikering og database-failover er testet. **Opnået 2026-08-25: db01 blev stoppet, db02 blev automatisk Patroni-leder, og db01 kom tilbage som streaming-replika.** |
-| M6 | Backup klar | PBS-backup og pgBackRest/WAL-backup er testet. PostgreSQL-restore via pgBackRest har et dokumenteret SFTP-fejlpunkt, som skal lukkes før endelig aflevering. |
+| M6 | Backup klar | PBS-backup samt pgBackRest/WAL-backup og isoleret database-restore er testet. **Opnået 2026-08-25.** |
 | M7 | Rapportgrundlag klar | Dokumentation, testbeviser og ændringslog er komplette. |
 
 ## 8. Accepttest
@@ -192,4 +192,4 @@ Projektet er klar til aflevering, når nedenstående er gennemført og dokumente
 | Pve03-kapacitet | PBS01 bruger 2 vCPU, 4 GB RAM, 32 GB systemdisk og 140 GB datadisk; etcd03 er etableret som lille LXC | Løbende kapacitetskontrol |
 | Netværk | VLAN'er og fysisk Corosync-net | Før produktionslignende drift |
 | Backup-politik | PostgreSQL PITR, kryptering og database-konsistent restore-test | Før endelig rapport/aflevering |
-| PostgreSQL restore | Ret pgBackRest SFTP-restorefejl og udfør en database-konsistent restore-test | Før endelig rapport/aflevering |
+| Fysisk værts-HA | Test tab af en hel PVE-vært; lokal LVM betyder, at workloads ikke kan genstartes automatisk på anden vært uden delt/replikeret storage | Før endelig rapport/aflevering |
