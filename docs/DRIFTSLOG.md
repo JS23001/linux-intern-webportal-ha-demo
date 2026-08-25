@@ -42,7 +42,9 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-25 | Database-HA | Oprettede etcd01 (`.48`), etcd02 (`.49`) og etcd03 (`.50`) og verificerede tre-medlems-kvorum. | etcd endpoint-status viste tre raske medlemmer og én leder. |
 | 2026-08-25 | Database-HA | Installerede Patroni på db01/db02 og satte HAProxy TCP-endpoint på portal-VIP'en. | HAProxy tjekker Patronis `/primary` på port 8008 og videresender kun port 5432 til den aktuelle PostgreSQL-leder. Begge webnoder bruger nu VIP'en som databasehost. |
 | 2026-08-25 | Database-HA | Kontrolleret automatisk failover-test. | Stop af Patroni på db01 stoppede den oprindelige leder. Efter leader-lease udløb promoverede Patroni db02 automatisk til leder (timeline 3). Portalens health-check gennem VIP'en var grøn, og db01 blev startet igen som streaming-replika med 0 MB lag. En ny portalregistrering skrevet gennem VIP'en efter failover blev derefter læst på begge databasenoder. |
+| 2026-08-25 | Databasebackup | Installerede pgBackRest 2.55.1 på db01, db02 og PBS01 og oprettede et nøglebeskyttet SFTP-repository på PBS01. | Patroni styrer WAL-arkivering; fuld backup og efterfølgende inkrementel backup blev oprettet og verificeret med `pgbackrest info`. Backupscriptet kører kun, når lokal Patroni-API svarer `/primary`. |
+| 2026-08-25 | Databasebackup | Testede restore til en særskilt, midlertidig datamappe. | Ikke bestået endnu: pgBackRest SFTP-restore fejler ved læsning af en repository-fil med libssh2 SFTP-fejl 4, selv om direkte SFTP-læsning af samme fil som `postgres` lykkes. Den midlertidige restoremappe blev slettet; produktionens data var ikke berørt. |
 
 ## Næste registrering
 
-Næste fase er fysisk værts-HA samt pgBackRest/WAL og en database-konsistent restore-test.
+Næste fase er fysisk værts-HA samt fejlretning og ny database-konsistent pgBackRest-restoretest.
