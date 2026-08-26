@@ -13,7 +13,7 @@ Formål: at holde en versionsstyret oversigt over **hvor** credentials håndtere
 | Administrator-SSH, RSA | Lokal `secrets/`-mappe, Git-ignoreret og adgangsbegrænset | Fingerprint registreret internt; nøglebaseret adgang til db02 valideret | Opret krypteret SOPS-recovery-kopi ved næste lokale, kontrollerede import |
 | Administrator-SSH, ED25519 | Lokal `secrets/`-mappe, Git-ignoreret og adgangsbegrænset | Fingerprint registreret internt; udrulning på alle værter er ikke bekræftet i denne audit | Kontrollér `authorized_keys`; udfas nøgle hvis den ikke bruges |
 | Container-værtsnøgler (`.43`–`.46`) | Lokal known-hosts-inventar | Nuværende ED25519-fingerprints matcher de registrerede fingerprints | Behold streng værtsnøglekontrol |
-| PVE-værtsnøgler (`.33`–`.35`) | Windows known-hosts | pve01 havde en gammel cached ECDSA-nøgle og afviste korrekt ny ED25519-nøgle | Verificér den nye fingerprint via fysisk konsol/Proxmox-konsol før known-hosts opdateres |
+| PVE-værtsnøgler (`.33`–`.35`) | Windows known-hosts | Alle tre havde gamle cached ECDSA-nøgler og præsenterer nu ED25519-nøgler | Verificér hver ny fingerprint via fysisk konsol/Proxmox-konsol før known-hosts opdateres |
 | age privat recovery-nøgle | Kun lokal, Git-ignoreret age-nøglefil | Bruges til SOPS-dekryptering | Lav én offline, fysisk adskilt recovery-kopi; må ikke lægges i samme SOPS-fil |
 
 ## Regler
