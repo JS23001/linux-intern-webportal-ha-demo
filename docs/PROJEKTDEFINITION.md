@@ -3,7 +3,7 @@
 | Felt | Indhold |
 |---|---|
 | Status | Portal, web-HA, PBS-backup og automatisk databasefailover er verificeret i labmiljøet |
-| Version | 0.22 |
+| Version | 0.24 |
 | Senest opdateret | 2026-08-26 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |

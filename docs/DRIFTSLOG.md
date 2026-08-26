@@ -53,6 +53,7 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-26 | Sikkerhed | Auditerede SSH-nøgler, værtsnøgler og SOPS/age-manageren. | De fire runtime-credentialfelter er SOPS-krypterede og lokal dekryptering blev valideret. Container-værtsnøgler `.43`–`.46` matcher deres registrerede ED25519-fingerprints. PVE01/02/03 har gamle cached ECDSA-værtsnøgler og præsenterer nu ED25519-nøgler; de ændres først efter uafhængig verifikation. |
 | 2026-08-26 | Vedligeholdelse | Uddybede opdateringspolitikken med gates, rækkefølge, rollback og frekvens. | Politikken er registreret i `OPDATERINGSPOLITIK.md`; den fulde backup-gate forbliver lukket, indtil en ordinær pgBackRest-kørsel er bekræftet. |
 | 2026-08-26 | Sikkerhed | Verificerede nye PVE ED25519-værtsnøgler via fysisk konsol og opdaterede local known-hosts. | Direkte nøglebaseret SSH lykkes nu mod pve01, pve02 og pve03. Deres root-SSH-policy er ens: kun nøglelogin, ingen password- eller keyboard-interactive-login. |
+| 2026-08-26 | Backup | Planlagde ekstra engangstest af pgBackRest kl. 10:30 dansk tid. | Transient systemd-timer `pgbackrest-oneoff-20260826-0830` er aktiv på db01 og db02 med trigger 08:30 UTC. Kun den aktuelle Patroni-leder udfører den inkrementelle backup. |
 
 ## Næste registrering
 
