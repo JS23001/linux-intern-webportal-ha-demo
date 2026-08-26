@@ -3,7 +3,7 @@
 | Felt | Indhold |
 |---|---|
 | Status | Portal, web-HA, PBS-backup og automatisk databasefailover er verificeret i labmiljøet |
-| Version | 0.21 |
+| Version | 0.22 |
 | Senest opdateret | 2026-08-26 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -141,7 +141,7 @@ En PBS-snapshot af en container er et ekstra infrastrukturlag, men erstatter ikk
 
 ## 5.2 Hemmelighedshåndtering
 
-Labbet bruger SOPS + age til krypterede secrets i Git og root-ejede runtime-filer med rettigheden `0600` på tjenesterne. En Vault-klynge er fravalgt, fordi den ville være en uforholdsmæssigt tung ekstra afhængighed i dette kapacitetsbegrænsede mock-miljø. Den konkrete nøgle-, deploy- og rotationsprocedure findes i `HEMMELIGHEDSHAANDTERING.md`.
+Labbet bruger SOPS + age til krypterede secrets i Git og root-ejede runtime-filer med rettigheden `0600` på tjenesterne. En Vault-klynge er fravalgt, fordi den ville være en uforholdsmæssigt tung ekstra afhængighed i dette kapacitetsbegrænsede mock-miljø. Den konkrete nøgle-, deploy- og rotationsprocedure findes i `HEMMELIGHEDSHAANDTERING.md`, og den aktuelle nøgle- og credentialstatus i `NOEGLEINVENTAR.md`.
 
 ## 5.3 Opdateringspolitik
 
@@ -158,6 +158,8 @@ Opdateringer udføres som planlagt, rullende vedligeholdelse og aldrig samtidig 
 Udfør først en læsende opdateringskontrol. Pakker installeres kun i et aftalt vedligeholdelsesvindue, og ingen PVE-vært eller databaseleder opdateres samtidig med sin redundante partner. Ved fejl stoppes rullen; sidste fungerende service holdes i drift og hændelsen dokumenteres.
 
 Den 26. august 2026 blev PBS-delen af backup-gaten bestået. pgBackRest-cronfilen manglede et afsluttende linjeskift og blev derfor ikke kørt af cron. Fejlen er rettet, backupscriptet og cron-parseren er testet, men den næste ordinære natlige pgBackRest-kørsel skal dokumenteres, før pakkeniveau-opdateringer påbegyndes.
+
+Den operationelle rækkefølge, gates og rollback-regler findes i `OPDATERINGSPOLITIK.md`.
 
 ## 6. Leverancer
 
