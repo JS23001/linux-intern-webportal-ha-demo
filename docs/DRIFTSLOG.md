@@ -55,6 +55,7 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-26 | Sikkerhed | Verificerede nye PVE ED25519-værtsnøgler via fysisk konsol og opdaterede local known-hosts. | Direkte nøglebaseret SSH lykkes nu mod pve01, pve02 og pve03. Deres root-SSH-policy er ens: kun nøglelogin, ingen password- eller keyboard-interactive-login. |
 | 2026-08-26 | Backup | Planlagde ekstra engangstest af pgBackRest kl. 10:30 dansk tid. | Transient systemd-timer `pgbackrest-oneoff-20260826-0830` er aktiv på db01 og db02 med trigger 08:30 UTC. Kun den aktuelle Patroni-leder udfører den inkrementelle backup. |
 | 2026-08-26 | Backup | Kontrollerede den planlagte engangstest af pgBackRest. | Timerne var afsluttet og selvfjernet som forventet. pgBackRest viser ny inkrementel backup fra 08:30:37–08:30:39 UTC med `status: ok`. db02 var leder og db01 var passiv, så lederkontrollen virkede. |
+| 2026-08-27 | Backup | Kontrollerede den ordinære natlige backup. | PBS-snapshots for CT101–106 fra 23:30 UTC var alle verificeret `ok`. pgBackRest-cron startede kl. 00:15 UTC, men loggede `runuser: not found`; crons `PATH` manglede `/usr/sbin`. Backupscriptet på db01/db02 bruger nu absolut sti til `runuser`. En test i samme minimale miljø gennemførte backup `20260825-105455F_20260827-070850I` med `status: ok`; næste ordinære natkørsel kontrolleres før opdateringer. |
 
 ## Næste registrering
 
