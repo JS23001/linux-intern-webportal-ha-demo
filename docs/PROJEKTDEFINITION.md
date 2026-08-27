@@ -3,7 +3,7 @@
 | Felt | Indhold |
 |---|---|
 | Status | Portal, web-HA, PBS-backup og automatisk databasefailover er verificeret i labmiljøet |
-| Version | 0.26 |
+| Version | 0.27 |
 | Senest opdateret | 2026-08-26 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
@@ -160,6 +160,8 @@ Udfør først en læsende opdateringskontrol. Pakker installeres kun i et aftalt
 Den 26. august 2026 blev PBS-delen af backup-gaten bestået. pgBackRest-cronfilen manglede først et afsluttende linjeskift og blev derfor ikke kørt af cron. Den næste ordinære kørsel den 27. august startede, men fejlede, fordi cron-miljøets `PATH` ikke indeholdt `/usr/sbin/runuser`. Begge fejl er rettet. En efterfølgende, tidsstyret `/etc/cron.d`-test kørte reelt på begge noder; db02 som leder oprettede konsistent backup, mens db01 var sikkert no-op. Backup-gaten er derfor grøn til læsende opdateringskontrol og planlægning.
 
 Den operationelle rækkefølge, gates og rollback-regler findes i `OPDATERINGSPOLITIK.md`.
+
+Den konkrete pakkestatus og rullende gennemførelsesrækkefølge for det aktuelle vedligeholdelsesvindue findes i `OPDATERINGSPLAN_2026-08-27.md`.
 
 ## 6. Leverancer
 

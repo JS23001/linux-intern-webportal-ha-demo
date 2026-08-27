@@ -57,6 +57,7 @@ Denne log beskriver, hvad der faktisk er udført. Den erstatter ikke ændringslo
 | 2026-08-26 | Backup | Kontrollerede den planlagte engangstest af pgBackRest. | Timerne var afsluttet og selvfjernet som forventet. pgBackRest viser ny inkrementel backup fra 08:30:37–08:30:39 UTC med `status: ok`. db02 var leder og db01 var passiv, så lederkontrollen virkede. |
 | 2026-08-27 | Backup | Kontrollerede den ordinære natlige backup. | PBS-snapshots for CT101–106 fra 23:30 UTC var alle verificeret `ok`. pgBackRest-cron startede kl. 00:15 UTC, men loggede `runuser: not found`; crons `PATH` manglede `/usr/sbin`. Backupscriptet på db01/db02 bruger nu absolut sti til `runuser`. En test i samme minimale miljø gennemførte backup `20260825-105455F_20260827-070850I` med `status: ok`; næste ordinære natkørsel kontrolleres før opdateringer. |
 | 2026-08-27 | Backup | Udførte tidsstyret, reel cron-simulation. | Begge DB-noder læste midlertidig cronfil kl. 07:13 UTC. Db02 som leder oprettede backup `20260825-105455F_20260827-071302I` med `status: ok`; db01 var passiv uden backup. Testfiler blev fjernet, og den passive 503-probe undertrykkes fremover i scriptets log. |
+| 2026-08-27 | Vedligeholdelse | Opdaterede APT-indekser og læste pakkestatus på PVE, LXC'er og PBS01. | Ingen pakker blev installeret. PVE01/02/03 har hver 3 OpenSSL-sikkerhedsopdateringer; LXC'erne har 21–25 base-/sikkerhedsopdateringer; PBS01 har 12 AppArmor-/GRUB-/shim-opdateringer. Rullende plan er oprettet før installation. |
 
 ## Næste registrering
 
