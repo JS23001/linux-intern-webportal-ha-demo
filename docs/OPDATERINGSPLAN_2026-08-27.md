@@ -1,6 +1,6 @@
 # Rullende opdateringsplan — 2026-08-27
 
-Status: klar til godkendt gennemførelse. Denne plan installerer **ingen** pakker af sig selv.
+Status: gennemført og verificeret 2026-08-27.
 
 ## Grundlag
 
@@ -47,4 +47,4 @@ Ved ét rødt kontrolpunkt stoppes rullen. Den redundante partner holdes i drift
 
 ## Godkendelsespunkt
 
-Planen er klar. Første installationsbølge påbegyndes kun efter eksplicit godkendelse af vedligeholdelsesvinduet.
+Vedligeholdelsesvinduet blev godkendt og gennemført. Alle PVE-værter og LXC'er har nu 0 ventende pakker; PBS01 har 0 ventende pakker og blev genstartet efter GRUB/shim-opdateringen. QEMU Guest Agent blev installeret og verificeret på PBS01. Databasen gennemførte en kontrolleret switchover fra db02 til db01; db01 er leder og db02 streamer replika. Portal, etcd, PBS og PVE-clusteret var grønne efter slutkontrol.

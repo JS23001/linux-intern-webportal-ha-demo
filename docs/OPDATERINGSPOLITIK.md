@@ -42,3 +42,9 @@ Efter hvert trin kontrolleres tjenestens health, logs og HA-status. Først når 
 ## Frekvens
 
 Læsende opdateringskontrol udføres ugentligt. Installationer sker kun i et aftalt vedligeholdelsesvindue efter grøn backup-gate. Kritiske sikkerhedsopdateringer følger samme rækkefølge og kontrol, men kan prioriteres til næste mulige vedligeholdelsesvindue.
+
+## Løbende automatisering
+
+Alle PVE-værter, LXC'er og PBS01 er konfigureret med daglig APT-indeksopdatering og download af ventende pakker samt ugentlig autoclean. Automatisk pakkeinstallation er bevidst sat til `0`: en uafhængig unattended-upgrade på begge sider af et HA-par kan opdatere eller genstarte redundante tjenester samtidigt uden health-gate.
+
+Den løbende model er derfor: systemerne holder automatisk deres opdateringsmetadata og pakker klar, mens installation udføres rullende efter denne politik, når backup-, quorum- og servicekontroller er grønne. En fremtidig fuldautomatisk installation kræver en central health-gated orkestrator og behandles som et særskilt designarbejde.
