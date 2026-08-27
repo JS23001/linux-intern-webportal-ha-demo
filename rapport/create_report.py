@@ -155,8 +155,8 @@ def add_title_page(doc):
     values = [
         ("Projekt", "Intern webportal - HA-demo"),
         ("Platform", "Tre Proxmox VE-værter med Debian LXC/VM-tjenester"),
-        ("Dato", "25. august 2026"),
-        ("Status", "Web-HA, databasefailover, backup og restore er verificeret"),
+        ("Dato", "27. august 2026"),
+        ("Status", "Afsluttet lab: HA, failover, backup/restore og rullende vedligehold er verificeret"),
     ]
     for row, (label, value) in zip(table.rows, values):
         set_cell_shading(row.cells[0], LIGHT_BLUE)
@@ -321,6 +321,28 @@ def add_report(doc):
         "testdata replikeres og kan automatisk fortsætte på ny databaseleder. Den testede "
         "backup- og restorevej supplerer tilgængeligheden med gendannelse. De oprindelige "
         "funktionskrav og de dokumenterede HA-udvidelser er dermed nået inden for labafgrænsningen."
+    )
+
+    add_heading(doc, "8. Afsluttende driftsstatus", 1)
+    doc.add_paragraph(
+        "Efter de oprindelige failover- og restoretests blev hele miljøet gennemgået i en "
+        "rullende vedligeholdelsesrunde. Etcd, proxyer, webnoder, databasepar, PBS01 og alle "
+        "tre Proxmox-værter blev opdateret én redundant partner ad gangen. Undervejs blev "
+        "Patroni flyttet kontrolleret til db01, og efter slutkontrollen var portal, etcd, "
+        "database-replikering og Proxmox-quorum grønne. Alle værter, containere og PBS01 "
+        "havde derefter nul ventende pakkeopdateringer."
+    )
+    add_heading(doc, "Ansvarlig opdateringsmodel", 2)
+    add_bullet(doc, "Alle systemer henter dagligt pakkelister og downloader ventende opdateringer; ugentlig oprydning reducerer diskforbrug.")
+    add_bullet(doc, "Automatisk installation er bevidst fravalgt, fordi to redundante noder ellers kan opdatere eller genstarte samtidigt uden health-gate.")
+    add_bullet(doc, "Installationer sker i et aftalt vindue efter grøn PBS- og pgBackRest-backup, rask portal, Patroni-replika og cluster-quorum.")
+    add_heading(doc, "Afsluttende vurdering", 2)
+    doc.add_paragraph(
+        "Projektet kan betragtes som færdigt som en dokumenteret HA-labdemonstration. Det er "
+        "ikke en produktionsløsning: især delt/replikeret storage, TLS på etcd, netværksadskillelse "
+        "og en off-site backupkopi ville være næste skridt ved reel drift. Begrænsningerne er kendte, "
+        "begrundede og dokumenterede, og de ændrer ikke på, at opgavens krav og de valgte HA-udvidelser "
+        "er testet og opfyldt i labmiljøet."
     )
 
 

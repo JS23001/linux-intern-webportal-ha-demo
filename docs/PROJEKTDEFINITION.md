@@ -3,8 +3,8 @@
 | Felt | Indhold |
 |---|---|
 | Status | Portal, web-HA, PBS-backup og automatisk databasefailover er verificeret i labmiljøet |
-| Version | 0.28 |
-| Senest opdateret | 2026-08-26 |
+| Version | 0.29 |
+| Senest opdateret | 2026-08-27 |
 | Ejer | Projektgruppen |
 | Kilde | Opgaven *Intern Webportal – Linux Servere* |
 
@@ -182,7 +182,7 @@ Den konkrete pakkestatus og rullende gennemførelsesrækkefølge for det aktuell
 | M4 | HA klar | VIP, load balancing, web-failover og fysisk værtsfailover er testet. **Opnået 2026-08-25: pve01 blev stoppet; pve02/pve03 beholdt quorum, og portal/database fortsatte på pve02.** |
 | M5 | Data klar | Datareplikering og database-failover er testet. **Opnået 2026-08-25: db01 blev stoppet, db02 blev automatisk Patroni-leder, og db01 kom tilbage som streaming-replika.** |
 | M6 | Backup klar | PBS-backup samt pgBackRest/WAL-backup og isoleret database-restore er testet. **Opnået 2026-08-25.** |
-| M7 | Rapportgrundlag klar | Dokumentation, testbeviser og ændringslog er komplette. |
+| M7 | Rapportgrundlag klar | Dokumentation, testbeviser og ændringslog er komplette. **Opnået 2026-08-27: slutrapport, vejlederguide med glossar og kort praktikportfolio er opdateret på grundlag af T01-T12.** |
 
 ## 8. Accepttest
 
